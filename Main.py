@@ -24,7 +24,7 @@ altura =  num_blocos_y * tamanho_bloco
 
 tela = pygame.display.set_mode((largura, altura), pygame.RESIZABLE)
 
-pygame.display.set_caption("Bomberman")
+pygame.display.set_caption("Bomberwoman") #
 
 preto = (0,0,0)
 

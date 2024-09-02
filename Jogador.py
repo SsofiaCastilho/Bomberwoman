@@ -16,10 +16,10 @@ class Player(Sprite): #herança da classe Sprite
         #Carregando imagens de animação do jogador:
         self.images = [
 
-            pygame.transform.scale(pygame.image.load('Bomberman/bomberman01.png').convert_alpha(), tamanho),
-            pygame.transform.scale(pygame.image.load('Bomberman/bomberman02.png').convert_alpha(), tamanho),
-            pygame.transform.scale(pygame.image.load('Bomberman/bomberman03.png').convert_alpha(), tamanho),
-            pygame.transform.scale(pygame.image.load('Bomberman/bomberman04.png').convert_alpha(), tamanho)
+            pygame.transform.scale(pygame.image.load('Bomberman/bomberwoman01.png').convert_alpha(), tamanho),
+            pygame.transform.scale(pygame.image.load('Bomberman/bomberwoman02.png').convert_alpha(), tamanho),
+            pygame.transform.scale(pygame.image.load('Bomberman/bomberwoman03.png').convert_alpha(), tamanho),
+            pygame.transform.scale(pygame.image.load('Bomberman/bomberwoman04.png').convert_alpha(), tamanho)
         ]
         self.image_index = 0
         self.image = self.images[self.image_index]
