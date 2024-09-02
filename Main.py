@@ -3,6 +3,9 @@ import sys
 from Mapa import Mapa
 from Jogador import Player
 from Inimigo import Inimigo
+from InimigoY import InimigoY
+from InimigoX import InimigoX
+from Inimigo1 import Inimigo1
 from tkinter import *
 
 
@@ -47,14 +50,19 @@ def main():
     tamanho_imagem = (tamanho_bloco - 9, tamanho_bloco - 9)
     tamanho_imagem_inimigo = (tamanho_bloco - 9, tamanho_bloco - 9)
     jogador = Player((60, 60), 100, 2, 3, mapa, tamanho= tamanho_imagem)
-    inimigo = Inimigo((tamanho_bloco * 14, tamanho_bloco * 14), 3, 15, 'direcao', mapa, tamanho = tamanho_imagem_inimigo)
-
+    inimigo = Inimigo1((tamanho_bloco * 14, tamanho_bloco * 14), 3, 12, 'direcao', mapa, tamanho = tamanho_imagem_inimigo)
+    inimigoY = InimigoY((tamanho_bloco * 4, tamanho_bloco * 10), 3, 9, 'direcao', mapa, tamanho = tamanho_imagem_inimigo)
+    inimigoX = InimigoX((tamanho_bloco * 14, tamanho_bloco * 2), 3, 9, 'direcao', mapa, tamanho = tamanho_imagem_inimigo)
+    
     mapa.jogadores = [jogador]
-    mapa.inimigos = [inimigo]
+    mapa.inimigos = [inimigo, inimigoY, inimigoX]
 
     sprites = pygame.sprite.Group()
     sprites.add(jogador)
     sprites.add(inimigo)
+    sprites.add(inimigoY)
+    sprites.add(inimigoX)
+
 
     while rodando:
         dt = clock.tick(60) / 100
@@ -75,6 +83,8 @@ def main():
         if not game_over and not vitoria:           
             jogador.update(dt)
             inimigo.update(jogador.rect.topleft, dt)
+            inimigoY.update(jogador.rect.topleft, dt)
+            inimigoX.update(jogador.rect.topleft, dt)
 
             tela.fill(preto)
             mapa.desenhar(tela)
@@ -82,10 +92,10 @@ def main():
             mapa.bombas.draw(tela)
             sprites.draw(tela)
 
-            # Atualização dos sprites
+            #Atualização dos sprites
             mapa.explosoes.update(dt)
 
-            # Desenho dos sprites
+            #Desenho dos sprites
             mapa.explosoes.draw(mapa.tela)
 
             mapa.update(dt)
@@ -93,7 +103,7 @@ def main():
             pygame.display.flip()
             if not jogador.alive():
                 game_over = True
-            if not inimigo.alive():
+            if not inimigo.alive() and not inimigoY.alive() and not inimigoX.alive():
                 vitoria = True
                 
 
