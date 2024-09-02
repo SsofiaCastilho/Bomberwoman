@@ -73,10 +73,10 @@ class Mapa:
                 x_pos = x * self.tamanho_bloco
                 y_pos = y * self.tamanho_bloco
                 if bloco == 'W':
-                    bloco_lateral = Bloco('Blocos/bloco_lateral4.png', x_pos, y_pos, self.tamanho_bloco)
+                    bloco_lateral = Bloco('Blocos/bloco_lateral.png', x_pos, y_pos, self.tamanho_bloco)
                     self.blocos.add(bloco_lateral)
                 elif bloco == 'B':
-                    bloco_fixo = Bloco('Blocos/blocoEstrelas.png', x_pos, y_pos, self.tamanho_bloco)
+                    bloco_fixo = Bloco('Blocos/bloco_estrelas.png', x_pos, y_pos, self.tamanho_bloco)
                     self.blocos.add(bloco_fixo)
                 elif bloco == 'E':
                     bloco_sprite = Bloco('Fundo/fundo.png', x_pos, y_pos, self.tamanho_bloco)                  
