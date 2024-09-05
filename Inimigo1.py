@@ -7,11 +7,36 @@ class Inimigo1(Inimigo):
     def __init__(self, posicao, vida, velocidade, direcao, mapa, tamanho):
         super().__init__(posicao, vida, velocidade, direcao, mapa, tamanho) 
         
-        self.tempo_ultimo_plante = 0
-        self.intervalo_bomba = 3
-        self.minhas_bombas = []
-        self.direcao = 'direita'
+        self.__tempo_ultimo_plante = 0
+        self.__intervalo_bomba = 3
+        self.__minhas_bombas = []
+        self.__direcao = 'direita'
+        
+        
+    @property
+    def tempo_ultimo_plante(self):
+        return self.__tempo_ultimo_plante
 
+    @property
+    def intervalo_bomba(self):
+        return self.__intervalo_bomba
+
+    @property
+    def minhas_bombas(self):
+        return self.__minhas_bombas
+    
+    @minhas_bombas.setter
+    def minhas_bombas(self, bomba):
+        self.__minhas_bombas = bomba
+        
+    @property
+    def direcao(self):
+        return self.__direcao
+
+    @direcao.setter
+    def direcao(self, nova_direcao):
+        self.__direcao = nova_direcao
+    
         
     #Verifica o caminho para ver se está livre:
     def caminho_bloqueado(self):
@@ -23,11 +48,11 @@ class Inimigo1(Inimigo):
     #Inimigo cria o objeto bomba e faz o plante:
     def plantar_bomba(self):
         current_time = pygame.time.get_ticks() / 1000
-        if current_time - self.tempo_ultimo_plante >= self.intervalo_bomba:
+        if current_time - self.__tempo_ultimo_plante >= self.__intervalo_bomba:
             bomba = Bomba(self.rect.topleft, 2, 30, (40, 40), self.mapa, dono= self)
-            self.minhas_bombas.append(bomba)
+            self.__minhas_bombas.append(bomba)
             self.mapa.bombas.add(bomba)
-            self.tempo_ultimo_plante = current_time
+            self.__tempo_ultimo_plante = current_time
             
     def movimento(self, posicao_player, dt: float):  # polimorfismo
         posicao_original = self.rect.topleft
@@ -59,17 +84,17 @@ class Inimigo1(Inimigo):
         # Atualiza a direção da animação
         if abs(delta_x) > abs(delta_y):
             if delta_x > 0:
-                self.direcao = 'direita'
+                self.__direcao = 'direita'
             else:
-                self.direcao = 'esquerda'
+                self.__direcao = 'esquerda'
         else:
             if delta_y > 0:
-                self.direcao = 'baixo'
+                self.__direcao = 'baixo'
             else:
-                self.direcao = 'cima'
+                self.__direcao = 'cima'
 
         # Atualiza a imagem do inimigo de acordo com a direção
-        self.image = self.imagens_direcoes[self.direcao][self.image_index]
+        self.__image = self.imagens_direcoes[self.__direcao][self.image_index]
 
         # Verifica se o caminho está bloqueado e planta bomba
         if self.caminho_bloqueado():
@@ -77,7 +102,7 @@ class Inimigo1(Inimigo):
         
         
     def colidir_propria_bomba(self):
-        for bomba in self.minhas_bombas:
+        for bomba in self.__minhas_bombas:
             if self.rect.colliderect(bomba.rect):
                 return True
         return False
@@ -88,5 +113,5 @@ class Inimigo1(Inimigo):
         if self.contador_tempo >= self.tempo_animacao:
             self.contador_tempo = 0
             self.image_index = (self.image_index + 1) % 3  # Atualiza o índice da imagem (0 a 2)
-            self.image = self.imagens_direcoes[self.direcao][self.image_index]  # Atualiza a imagem de acordo com a direção
+            self.__image = self.imagens_direcoes[self.__direcao][self.image_index]  # Atualiza a imagem de acordo com a direção
 

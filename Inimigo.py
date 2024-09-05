@@ -13,11 +13,11 @@ class Inimigo(Sprite): #herança da classe Sprite
         self.__vida = vida
         self.__velocidade = velocidade
         self.__direcao = direcao
-
-        self.mapa = mapa
+        self.__minhas_bombas = []
+        self.__mapa = mapa
         
         # Carregando imagens inimigo
-        self.images = [
+        self.__images = [
             pygame.transform.scale(pygame.image.load(
                 'Inimigo/inimigo_andando01.png').convert_alpha(), tamanho),
             pygame.transform.scale(pygame.image.load(
@@ -45,26 +45,32 @@ class Inimigo(Sprite): #herança da classe Sprite
         ]
         
                 
-        self.imagens_direcoes = {
-            'baixo': self.images[0:3],
-            'direita': self.images[3:6],
-            'cima': self.images[6:9],
-            'esquerda': self.images[9:12]
+        self.__imagens_direcoes = {
+            'baixo': self.__images[0:3],
+            'direita': self.__images[3:6],
+            'cima': self.__images[6:9],
+            'esquerda': self.__images[9:12]
         }
 
-        self.image_index = 0
-        self.image = self.images[self.image_index]
-        self.rect = self.image.get_rect()
+        self.__image_index = 0
+        self.__image = self.__images[self.__image_index]
+        self.__rect = self.__image.get_rect()
 
-        # Definindo posição inicial do inimigo
-        self.rect.bottomright = posicao
+        #Definindo posição inicial do inimigo
+        self.__rect.bottomright = posicao
 
-        # Tempo de troca de animação
-        self.tempo_animacao = 1
-        self.contador_tempo = 0
+        #Tempo de troca de animação
+        self.__tempo_animacao = 1
+        self.__contador_tempo = 0
    
-
-
+    @property
+    def minhas_bombas(self):
+        return self.__minhas_bombas
+    
+    @minhas_bombas.setter
+    def minhas_bombas(self, bomba):
+        self.__minhas_bombas = bomba
+        
     @property
     def posicao(self):
         return self.__posicao
@@ -84,14 +90,53 @@ class Inimigo(Sprite): #herança da classe Sprite
     @direcao.setter
     def direcao(self, nova_direcao):
         self.__direcao = nova_direcao
-       
+
+    @property
+    def mapa(self):
+        return self.__mapa
+
+    @property
+    def images(self):
+        return self.__images
+
+    @property
+    def imagens_direcoes(self):
+        return self.__imagens_direcoes
+
+    @property
+    def image_index(self):
+        return self.__image_index
+    
+    @image_index.setter
+    def image_index(self, novo_index):
+        self.__image_index = novo_index 
+
+    @property
+    def image(self):
+        return self.__image
+
+    @property
+    def rect(self):
+        return self.__rect
+
+    @property
+    def tempo_animacao(self):
+        return self.__tempo_animacao
+
+    @property
+    def contador_tempo(self):
+        return self.__contador_tempo
+    
+    @contador_tempo.setter
+    def contador_tempo(self, novo_contador):
+        self.__contador_tempo = novo_contador
 
     def movimento(self, posicao_player, dt: float):
         pass
     
     
     def sofrer_dano(self, fonte):
-        if fonte in self.minhas_bombas:
+        if fonte in self.__minhas_bombas:
             return
         self.__vida -= 1
         print(f"Inimigo sofreu dano. Vidas restantes: {self.__vida}")
@@ -99,8 +144,8 @@ class Inimigo(Sprite): #herança da classe Sprite
             self.morrer()
             
     def matar_jogador(self):
-        if not self.vida <= 0:
-            for jogador in self.mapa.jogadores:
+        if not self.__vida <= 0:
+            for jogador in self.__mapa.jogadores:
                 if pygame.sprite.collide_rect(self, jogador):
                     jogador.morrer()
 
@@ -111,27 +156,27 @@ class Inimigo(Sprite): #herança da classe Sprite
     #Verifica a colisão do inimigo com blocos e bomba:
     def colisao(self, sprite, eixo):
         if eixo == 'x':
-            if self.rect.x < sprite.rect.x:
-                self.rect.right = sprite.rect.left
+            if self.__rect.x < sprite.rect.x:
+                self.__rect.right = sprite.rect.left
             else:
-                self.rect.left = sprite.rect.right
+                self.__rect.left = sprite.rect.right
         elif eixo == 'y':
-            if self.rect.y < sprite.rect.y:
-                self.rect.bottom = sprite.rect.top
+            if self.__rect.y < sprite.rect.y:
+                self.__rect.bottom = sprite.rect.top
             else:
-                self.rect.top = sprite.rect.bottom
+                self.__rect.top = sprite.rect.bottom
 
     def animacao(self, dt: float):
-        self.contador_tempo += dt
-        if self.contador_tempo >= self.tempo_animacao:
-            self.contador_tempo = 0
-            self.image_index = (self.image_index + 1) % len(self.images)
-            self.image = self.images[self.image_index]
+        self.__contador_tempo += dt
+        if self.__contador_tempo >= self.__tempo_animacao:
+            self.__contador_tempo = 0
+            self.__image_index = (self.__image_index + 1) % len(self.__images)
+            self.__image = self.__images[self.__image_index]
             
     def update(self, posicao_player, dt: float):
         self.movimento(posicao_player, dt)
         # Atualiza animação quando inimigo se move
         self.animacao(dt)
-        if not self.vida <= 0:
-            if posicao_player[0] - self.rect.centerx <= 40 and posicao_player[1] - self.rect.centery <= 40:
+        if not self.__vida <= 0:
+            if posicao_player[0] - self.__rect.centerx <= 40 and posicao_player[1] - self.__rect.centery <= 40:
                 self.matar_jogador()
