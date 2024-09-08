@@ -3,7 +3,7 @@ import pygame
 from Bomba import Bomba
 from Inimigo import Inimigo
 
-class Inimigo1(Inimigo):  
+class Inimigo1(Inimigo):  #herança da classe Inimigo
     def __init__(self, posicao, vida, velocidade, direcao, mapa, tamanho):
         super().__init__(posicao, vida, velocidade, direcao, mapa, tamanho) 
         
@@ -48,7 +48,7 @@ class Inimigo1(Inimigo):
     #Inimigo cria o objeto bomba e faz o plante:
     def plantar_bomba(self):
         current_time = pygame.time.get_ticks() / 1000
-        if current_time - self.__tempo_ultimo_plante >= self.__intervalo_bomba:
+        if current_time - self.__tempo_ultimo_plante >= self.__intervalo_bomba and self.alive():
             bomba = Bomba(self.rect.topleft, 2, 30, (40, 40), self.mapa, dono= self)
             self.__minhas_bombas.append(bomba)
             self.mapa.bombas.add(bomba)

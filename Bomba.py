@@ -1,76 +1,7 @@
 import pygame
-from pygame.sprite import Sprite, Group
+from pygame.sprite import Sprite
 import math
-
-class Explosao(Sprite): #herança da classe Sprite
-    def __init__(self, posicao, tamanho, tempo_animacao, mapa, dono = None):
-        super().__init__()
-
-        self.__images = [
-            pygame.transform.scale(pygame.image.load('Explosão/explosao.png').convert_alpha(), tamanho),
-            pygame.transform.scale(pygame.image.load('Explosão/explosao2.png').convert_alpha(), tamanho),
-            pygame.transform.scale(pygame.image.load('Explosão/explosao3.png').convert_alpha(), tamanho)
-
-        ]
-
-        self.__image_index = 0
-        self.__image = self.__images[self.__image_index]
-        self.__rect = self.__image.get_rect(center = posicao)
-        self.__tempo_animacao = tempo_animacao
-        self.__contador_tempo = 0
-        self.__mapa = mapa
-        self.__dono = dono
-
-    def update(self, dt):
-        self.__contador_tempo += dt
-        if self.__contador_tempo >= self.__tempo_animacao:
-            self.__contador_tempo = 0
-            self.__image_index += 1
-            if self.__image_index < len(self.__images):
-                self.__image = self.__images[self.__image_index]
-            else:
-                self.causar_dano()
-                self.kill()
-            
-    def causar_dano(self):
-        for sprite in pygame.sprite.spritecollide(self, self.__mapa.jogadores, False):
-            sprite.sofrer_dano(self)
-        for sprite in pygame.sprite.spritecollide(self, self.__mapa.inimigos, False):
-            if sprite != self.__dono:
-                sprite.sofrer_dano(self)
-
-
-    @property
-    def images(self):
-        return self.__images
-
-    @property
-    def image_index(self):
-        return self.__image_index
-
-    @property
-    def image(self):
-        return self.__image
-
-    @property
-    def rect(self):
-        return self.__rect
-
-    @property
-    def tempo_animacao(self):
-        return self.__tempo_animacao
-
-    @property
-    def contador_tempo(self):
-        return self.__contador_tempo
-
-    @property
-    def mapa(self):
-        return self.__mapa
-
-    @property
-    def dono(self):
-        return self.__dono
+from Explosao import Explosao
     
 class Bomba(Sprite): #herança da classe Sprite
     def __init__(self, posicaobomba, tempo, raiodeexplosao, tamanho, mapa, dono = None):
@@ -82,8 +13,10 @@ class Bomba(Sprite): #herança da classe Sprite
         self.__tempo_decorrido = 0
         self.__mapa = mapa
         self.__dono = dono
+        self.__dano_player = False
 
         self.__image_index = 0
+        
         self.__images = [
             pygame.transform.scale(pygame.image.load('Bombas/bombinha01.png').convert_alpha(), tamanho),
             pygame.transform.scale(pygame.image.load('Bombas/bombinha02.png').convert_alpha(), tamanho),
@@ -124,17 +57,15 @@ class Bomba(Sprite): #herança da classe Sprite
                         if distancia < menor_distancia:
                             menor_distancia = distancia
                             bloco_mais_proximo = bloco
-                            
-        if bloco_mais_proximo:
-            print(f"Colisão detectada com bloco destrutível: {bloco.rect}") #Testando a colisão
-            bloco_mais_proximo.kill()
-            self.__mapa.blocos.remove(bloco_mais_proximo)
-            bloco_destruido = True
-                
+                            print(f"Colisão detectada com bloco destrutível: {bloco.rect}") #Testando a colisão
+                            bloco_mais_proximo.kill()
+                            self.__mapa.blocos.remove(bloco_mais_proximo)
+                            bloco_destruido = True
+                        
         for jogador in self.__mapa.jogadores:
             if raio_explosao.colliderect(jogador.rect):
                 print("Colisão com jogador detectada")
-                jogador.morrer()
+                self.__dano_player = True
 
         for inimigo in self.__mapa.inimigos:
             if raio_explosao.colliderect(inimigo.rect):
@@ -159,6 +90,10 @@ class Bomba(Sprite): #herança da classe Sprite
             self.__image = self.__images[self.__image_index]
         if self.__tempo_decorrido >= self.__tempo:
             self.explodir()
+        if self.__dano_player:
+            self.__dano_player = False
+            return True
+        return False
 
     
     @property

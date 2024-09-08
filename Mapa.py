@@ -1,50 +1,7 @@
 import pygame
 from pygame.sprite import Sprite
-
-
-class Bloco(Sprite): #herança da classe Sprite
-    def __init__(self, imagem, x, y, tamanho_bloco, destrutivel = False):
-        super().__init__() #Inicializando a sprite
-        self.__image = pygame.image.load(imagem).convert_alpha()
-        self.__image = pygame.transform.scale(self.__image,(tamanho_bloco, tamanho_bloco))
-        self.__rect = self.__image.get_rect()
-        self.__rect.topleft = (x , y) # para definir a posição do retângulo (Bloco destrutivel) na tela
-        self.__destrutivel = destrutivel
-        self.__jogadores = []
-        self.__inimigos = []
-
-    @property
-    def image(self):
-        return self.__image
-
-    @property
-    def rect(self):
-        return self.__rect
-
-    @property
-    def destrutivel(self):
-        return self.__destrutivel
-
-    @property
-    def jogadores(self):
-        return self.__jogadores
-
-    @property
-    def inimigos(self):
-        return self.__inimigos
-    
-
-    def aumentar_tamanho(self,tamanho_novo):
-        center = self.__rect.center
-        self.__image = pygame.transform.scale(self.__image,(tamanho_novo, tamanho_novo))
-        self.__rect = self.__image.get_rect()
-        self.__rect.center = center
-
-
-    def redimensionar_imagem(self, novo_tamanho):
-        self.__image = pygame.transform.scale(self.__image, (novo_tamanho, novo_tamanho))
-        self.__rect = self.__image.get_rect(topleft = self.__rect.topleft)
-
+from Bloco import Bloco
+   
 class Mapa:    
     def __init__(self, num_blocos_x, num_blocos_y, tamanho_bloco, tela):
         self.__branco = (255,255,255)
@@ -58,13 +15,13 @@ class Mapa:
         self.__tamanho_bloco = tamanho_bloco
 
         
-        #definindo mapa
+        #Definindo mapa
         self.mapa = [
-            # 'W' = paredes, 'E' = espaços vazios e 'B' = bloco indestrutível e 'D' = bloco destrutível
+            #'W' = paredes, 'E' = espaços vazios e 'B' = bloco indestrutível, 'D' = bloco destrutível e 'P' = poder
             "WWWWWWWWWWWWWWW",
             "WEEEDDDDDDDEEEW",
             "WEBEBEBEBEBDBEW",
-            "WEDDDDDDEEEDDEW",
+            "WEDDDDDDPEEDDEW",
             "WDBEBEBEBEBDBDW",
             "WDDEDDDDDDEDDDW",
             "WDBEBEBDBEBDBDW",
@@ -81,10 +38,12 @@ class Mapa:
         
 
         self.blocos = pygame.sprite.Group()
+        self.__poder = pygame.sprite.Group()
         self.__bombas = pygame.sprite.Group()
         self.__explosoes = pygame.sprite.Group()
         self.criar_mapa()
-        
+       
+ 
     @property
     def branco(self):
         return self.__branco
@@ -117,14 +76,6 @@ class Mapa:
     def tamanho_bloco(self):
         return self.__tamanho_bloco
 
-    """@property
-    def mapa(self):
-        return self.mapa"""
-
-    """@property
-    def blocos(self):
-        return self.blocos"""
-
     @property
     def bombas(self):
         return self.__bombas
@@ -132,6 +83,11 @@ class Mapa:
     @property
     def explosoes(self):
         return self.__explosoes
+    
+    @property
+    def poder(self):
+        return self.__poder
+    
     
     
     def criar_mapa(self):
@@ -145,16 +101,19 @@ class Mapa:
                     self.blocos.add(bloco_lateral)
                 elif bloco == 'B':
                     bloco_fixo = Bloco('Blocos/bloco_estrelas.png', x_pos, y_pos, self.__tamanho_bloco)
-                    self.blocos.add(bloco_fixo)
-                elif bloco == 'E':
-                    bloco_sprite = Bloco('Fundo/fundo.png', x_pos, y_pos, self.__tamanho_bloco)                  
+                    self.blocos.add(bloco_fixo)            
                 elif bloco == 'D':
                     bloco_destrutivel = Bloco('Blocos/bloco_destrutivel.png', x_pos, y_pos, self.__tamanho_bloco, destrutivel= True)
                     self.blocos.add(bloco_destrutivel)
+                elif bloco == 'P':
+                    bloco_poder = Bloco('Blocos/poder.png', x_pos, y_pos, self.__tamanho_bloco - 15)
+                    bloco_poder.centralizar(x_pos + self.__tamanho_bloco // 2, y_pos + self.__tamanho_bloco // 2)
+                    self.poder.add(bloco_poder)
     
 
     def desenhar(self, tela):
         self.blocos.draw(tela)
+        self.__poder.draw(tela)
         self.__bombas.draw(tela)
 
     def update(self, dt):

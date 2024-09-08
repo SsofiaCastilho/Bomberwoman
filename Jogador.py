@@ -3,7 +3,7 @@ from pygame.sprite import Sprite
 from Mapa import Mapa
 from Bomba import Bomba
 
-class Player(Sprite): #herança da classe Sprite
+class Player(Sprite): #Herança da classe Sprite
     def __init__(self, posicao, vida, velocidade, range_bomba, mapa, tamanho):
         super().__init__() #Inicialização da Super classe: Sprite através de um metodo construtor
         
@@ -12,6 +12,12 @@ class Player(Sprite): #herança da classe Sprite
         self.__velocidade = velocidade
         self.__range_bomba = range_bomba
         self.__mapa = mapa
+        
+        # Inicializa o mixer de som do pygame
+        pygame.mixer.init()
+
+        # Carrega o som
+        self.__som = pygame.mixer.Sound('explosao.wav')  # Substitua pelo caminho do seu arquivo de som
 
         #Carregando imagens de animação do jogador:
         self.__images = [
@@ -34,7 +40,7 @@ class Player(Sprite): #herança da classe Sprite
 
         #Variaveis de controle do tempo de plantar a bomba:
         self.__tempo_ultimo_plante = 0
-        self.__intervalo_bomba = 3
+        self.__intervalo_bomba = 2
     
     @property 
     def image(self):
@@ -68,6 +74,10 @@ class Player(Sprite): #herança da classe Sprite
     def rect(self):
         return self.__rect
     
+    @property 
+    def som(self):
+        return self.__som
+    
     def movimento(self):
         keys = pygame.key.get_pressed()
         movimento_x = 0
@@ -87,24 +97,31 @@ class Player(Sprite): #herança da classe Sprite
         
    #Movimenta o Jogador no eixo X e checa colisões:
         self.__rect.x += movimento_x
-        bloco_colidido = pygame.sprite.spritecollideany(self, self.__mapa.blocos)  
+        bloco_colidido = pygame.sprite.spritecollideany(self, self.__mapa.blocos) 
+        poder_colidido = pygame.sprite.spritecollideany(self, self.__mapa.poder)
         bomba_colidida = pygame.sprite.spritecollideany(self, self.__mapa.bombas) 
-        if bloco_colidido or bomba_colidida:
+        if bloco_colidido or bomba_colidida or poder_colidido:
             if bloco_colidido:
                 self.colisao(bloco_colidido, eixo='x')
             if bomba_colidida:
                 self.colisao(bomba_colidida, eixo='x')
+            if poder_colidido:
+                poder_colidido.kill()
+                self.__vida += 1
+                print(self.__vida)
      
-    # Movimenta o jogador no eixo Y e checa colisões
+    #Movimenta o jogador no eixo Y e checa colisões
         self.__rect.y += movimento_y
         bloco_colidido = pygame.sprite.spritecollideany(self, self.__mapa.blocos)  
         bomba_colidida = pygame.sprite.spritecollideany(self, self.__mapa.bombas) 
-        if bloco_colidido or bomba_colidida:
+        if bloco_colidido or bomba_colidida or poder_colidido:
             if bloco_colidido:
                 self.colisao(bloco_colidido, eixo='y')
             if bomba_colidida:
                 self.colisao(bomba_colidida, eixo='y')
-
+            if poder_colidido:
+                poder_colidido.kill()
+                print(self.__vida)
         self.__posicao = self.__rect.topleft
 
     def colisao(self, sprite, eixo):
@@ -125,6 +142,7 @@ class Player(Sprite): #herança da classe Sprite
                    self.__rect.top = sprite.rect.bottom
 
 
+
     #Metodo para Jogador plantar a bomba, ajuste de tamanho, tempo, raio da bomba e o tempo de um plante para o outro:
     def plantar_bomba(self, dt):
         current_time = pygame.time.get_ticks() / 1000 #Obtem o tempo atual em segundos
@@ -138,14 +156,19 @@ class Player(Sprite): #herança da classe Sprite
             elif self.__image == self.__images[3]:  #Imagem apontando para esquerda
                 bomba_pos = (self.__rect.left - 40, self.__rect.centery - 20)
                         
-            bomba = Bomba(bomba_pos, 4.0, 50, (40, 40), self.__mapa)
-
+            bomba = Bomba(bomba_pos, 4.0, 60, (40, 40), self.__mapa)
+            
+            
             self.__mapa.bombas.add(bomba)
             self.__tempo_ultimo_plante = current_time #Atualiza o tempo da ultima bomba plantada
+
+            # Reproduz o som
+            self.__som.play()
     
     #Metodo para dano sofrido pelo jogador:
     def sofrer_dano(self):
         self.__vida -= 1
+        print(f"Jogador sofreu dano. Vidas restantes: {self.__vida}")
         if self.__vida <= 0:
             self.morrer()
  
@@ -156,7 +179,6 @@ class Player(Sprite): #herança da classe Sprite
        
     def update(self, dt):
         self.movimento() 
-        #self.__animacao(dt)
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE]:
             self.plantar_bomba(dt)

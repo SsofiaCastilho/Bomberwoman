@@ -6,7 +6,7 @@ from Bomba import Bomba
 from Jogador import Player
 
 
-class Inimigo(Sprite): #herança da classe Sprite
+class Inimigo(Sprite): #Herança da classe Sprite
     def __init__(self, posicao, vida, velocidade, direcao, mapa, tamanho):
         super().__init__()
         self.__posicao = posicao
@@ -16,7 +16,7 @@ class Inimigo(Sprite): #herança da classe Sprite
         self.__minhas_bombas = []
         self.__mapa = mapa
         
-        # Carregando imagens inimigo
+        #Carregando imagens inimigo
         self.__images = [
             pygame.transform.scale(pygame.image.load(
                 'Inimigo/inimigo_andando01.png').convert_alpha(), tamanho),
@@ -114,6 +114,10 @@ class Inimigo(Sprite): #herança da classe Sprite
     @property
     def image(self):
         return self.__image
+    
+    @image.setter
+    def image(self, nova_imagem):
+        self.__image = nova_imagem
 
     @property
     def rect(self):
