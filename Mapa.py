@@ -2,7 +2,7 @@ import pygame
 from pygame.sprite import Sprite
 from Bloco import Bloco
    
-class Mapa:    
+class Mapa():    
     def __init__(self, num_blocos_x, num_blocos_y, tamanho_bloco, tela):
         self.__branco = (255,255,255)
         self.__preto = (0,0,0)
